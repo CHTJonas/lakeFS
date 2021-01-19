@@ -55,6 +55,4 @@ var migrateDBCmd = &cobra.Command{
 func init() {
 	migrateCmd.AddCommand(migrateDBCmd)
 	migrateDBCmd.Flags().String("repository", "", "Repository filter (regexp)")
-	migrateDBCmd.Flags().String("branch", "", "Branch filter (regexp)")
-	migrateDBCmd.Flags().Bool("history", true, "Import complete history")
 }
