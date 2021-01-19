@@ -12,7 +12,6 @@ import (
 	"github.com/treeverse/lakefs/catalog"
 	"github.com/treeverse/lakefs/catalog/mvcc"
 	"github.com/treeverse/lakefs/catalog/rocks"
-	"github.com/treeverse/lakefs/config"
 	"github.com/treeverse/lakefs/db"
 	"github.com/treeverse/lakefs/graveler"
 	"github.com/treeverse/lakefs/logging"
@@ -57,14 +56,7 @@ func (m *Migrate) Close() error {
 	return m.mvccCataloger.Close()
 }
 
-func NewMigrate(db db.Database, cfg *config.Config) (*Migrate, error) {
-	entryCatalog, err := rocks.NewEntryCatalog(cfg, db)
-	if err != nil {
-		return nil, err
-	}
-
-	mvccParams := cfg.GetMvccCatalogerCatalogParams()
-	mvccCataloger := mvcc.NewCataloger(db, mvcc.WithParams(mvccParams))
+func NewMigrate(db db.Database, entryCatalog *rocks.EntryCatalog, mvccCataloger catalog.Cataloger) (*Migrate, error) {
 	return &Migrate{
 		db:            db,
 		entryCatalog:  entryCatalog,
@@ -109,7 +101,11 @@ func (m *Migrate) Run() error {
 			merr = multierror.Append(merr, err)
 		}
 	}
-	m.log.WithFields(logging.Fields{"repositories_len": len(repos)}).Info("Done migrate")
+
+	if err = m.postMigrate(); err != nil {
+		m.log.WithError(err).Error("Post migrate")
+		merr = multierror.Append(merr, err)
+	}
 	return merr
 }
 
@@ -338,6 +334,16 @@ func (m *Migrate) selectRepoCommits(ctx context.Context, repo *graveler.Reposito
 		return nil, fmt.Errorf("select commits (%s): %w", repo.RepositoryID, err)
 	}
 	return rows, nil
+}
+
+func (m *Migrate) postMigrate() error {
+	m.log.Info("start analyze db")
+	_, err := m.db.Exec(`
+		analyze graveler_staging_kv;
+		analyze graveler_commits;
+		analyze graveler_tags;
+		analyze graveler_branches;`)
+	return err
 }
 
 func (c *commitRecord) Scan(rows pgx.Row) error {

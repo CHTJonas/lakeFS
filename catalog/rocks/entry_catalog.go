@@ -72,7 +72,7 @@ func (id Path) String() string {
 }
 
 type EntryCatalog struct {
-	store graveler.Graveler
+	Store graveler.Graveler
 }
 
 const (
@@ -126,12 +126,12 @@ func NewEntryCatalog(cfg *config.Config, db db.Database) (*EntryCatalog, error) 
 	refManager := ref.NewPGRefManager(db)
 	branchLocker := ref.NewBranchLocker(db)
 	return &EntryCatalog{
-		store: graveler.NewGraveler(branchLocker, committedManager, stagingManager, refManager),
+		Store: graveler.NewGraveler(branchLocker, committedManager, stagingManager, refManager),
 	}, nil
 }
 
 func (e *EntryCatalog) CommitExistingMetaRange(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID, metaRangeID graveler.MetaRangeID, committer string, message string, metadata graveler.Metadata) (graveler.CommitID, error) {
-	return e.store.CommitExistingMetaRange(ctx, repositoryID, branchID, metaRangeID, committer, message, metadata)
+	return e.Store.CommitExistingMetaRange(ctx, repositoryID, branchID, metaRangeID, committer, message, metadata)
 }
 
 func (e *EntryCatalog) AddCommitNoLock(ctx context.Context, repositoryID graveler.RepositoryID, commit graveler.Commit) (graveler.CommitID, error) {
@@ -140,7 +140,7 @@ func (e *EntryCatalog) AddCommitNoLock(ctx context.Context, repositoryID gravele
 	}); err != nil {
 		return "", err
 	}
-	return e.store.AddCommitNoLock(ctx, repositoryID, commit)
+	return e.Store.AddCommitNoLock(ctx, repositoryID, commit)
 }
 
 func (e *EntryCatalog) GetRepository(ctx context.Context, repositoryID graveler.RepositoryID) (*graveler.Repository, error) {
@@ -149,7 +149,7 @@ func (e *EntryCatalog) GetRepository(ctx context.Context, repositoryID graveler.
 	}); err != nil {
 		return nil, err
 	}
-	return e.store.GetRepository(ctx, repositoryID)
+	return e.Store.GetRepository(ctx, repositoryID)
 }
 
 func (e *EntryCatalog) CreateRepository(ctx context.Context, repositoryID graveler.RepositoryID, storageNamespace graveler.StorageNamespace, branchID graveler.BranchID) (*graveler.Repository, error) {
@@ -159,11 +159,11 @@ func (e *EntryCatalog) CreateRepository(ctx context.Context, repositoryID gravel
 	}); err != nil {
 		return nil, err
 	}
-	return e.store.CreateRepository(ctx, repositoryID, storageNamespace, branchID)
+	return e.Store.CreateRepository(ctx, repositoryID, storageNamespace, branchID)
 }
 
 func (e *EntryCatalog) ListRepositories(ctx context.Context) (graveler.RepositoryIterator, error) {
-	return e.store.ListRepositories(ctx)
+	return e.Store.ListRepositories(ctx)
 }
 
 func (e *EntryCatalog) DeleteRepository(ctx context.Context, repositoryID graveler.RepositoryID) error {
@@ -172,7 +172,7 @@ func (e *EntryCatalog) DeleteRepository(ctx context.Context, repositoryID gravel
 	}); err != nil {
 		return err
 	}
-	return e.store.DeleteRepository(ctx, repositoryID)
+	return e.Store.DeleteRepository(ctx, repositoryID)
 }
 
 func (e *EntryCatalog) CreateBranch(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID, ref graveler.Ref) (*graveler.Branch, error) {
@@ -183,7 +183,7 @@ func (e *EntryCatalog) CreateBranch(ctx context.Context, repositoryID graveler.R
 	}); err != nil {
 		return nil, err
 	}
-	return e.store.CreateBranch(ctx, repositoryID, branchID, ref)
+	return e.Store.CreateBranch(ctx, repositoryID, branchID, ref)
 }
 
 func (e *EntryCatalog) UpdateBranch(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID, ref graveler.Ref) (*graveler.Branch, error) {
@@ -194,7 +194,7 @@ func (e *EntryCatalog) UpdateBranch(ctx context.Context, repositoryID graveler.R
 	}); err != nil {
 		return nil, err
 	}
-	return e.store.UpdateBranch(ctx, repositoryID, branchID, ref)
+	return e.Store.UpdateBranch(ctx, repositoryID, branchID, ref)
 }
 
 func (e *EntryCatalog) GetBranch(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID) (*graveler.Branch, error) {
@@ -204,7 +204,7 @@ func (e *EntryCatalog) GetBranch(ctx context.Context, repositoryID graveler.Repo
 	}); err != nil {
 		return nil, err
 	}
-	return e.store.GetBranch(ctx, repositoryID, branchID)
+	return e.Store.GetBranch(ctx, repositoryID, branchID)
 }
 
 func (e *EntryCatalog) GetTag(ctx context.Context, repositoryID graveler.RepositoryID, tagID graveler.TagID) (*graveler.CommitID, error) {
@@ -214,7 +214,7 @@ func (e *EntryCatalog) GetTag(ctx context.Context, repositoryID graveler.Reposit
 	}); err != nil {
 		return nil, err
 	}
-	return e.store.GetTag(ctx, repositoryID, tagID)
+	return e.Store.GetTag(ctx, repositoryID, tagID)
 }
 
 func (e *EntryCatalog) CreateTag(ctx context.Context, repositoryID graveler.RepositoryID, tagID graveler.TagID, commitID graveler.CommitID) error {
@@ -225,7 +225,7 @@ func (e *EntryCatalog) CreateTag(ctx context.Context, repositoryID graveler.Repo
 	}); err != nil {
 		return err
 	}
-	return e.store.CreateTag(ctx, repositoryID, tagID, commitID)
+	return e.Store.CreateTag(ctx, repositoryID, tagID, commitID)
 }
 
 func (e *EntryCatalog) DeleteTag(ctx context.Context, repositoryID graveler.RepositoryID, tagID graveler.TagID) error {
@@ -235,7 +235,7 @@ func (e *EntryCatalog) DeleteTag(ctx context.Context, repositoryID graveler.Repo
 	}); err != nil {
 		return err
 	}
-	return e.store.DeleteTag(ctx, repositoryID, tagID)
+	return e.Store.DeleteTag(ctx, repositoryID, tagID)
 }
 
 func (e *EntryCatalog) ListTags(ctx context.Context, repositoryID graveler.RepositoryID, from graveler.TagID) (graveler.TagIterator, error) {
@@ -245,7 +245,7 @@ func (e *EntryCatalog) ListTags(ctx context.Context, repositoryID graveler.Repos
 	}); err != nil {
 		return nil, err
 	}
-	it, err := e.store.ListTags(ctx, repositoryID)
+	it, err := e.Store.ListTags(ctx, repositoryID)
 	if err != nil {
 		return nil, err
 	}
@@ -262,7 +262,7 @@ func (e *EntryCatalog) Log(ctx context.Context, repositoryID graveler.Repository
 	}); err != nil {
 		return nil, err
 	}
-	return e.store.Log(ctx, repositoryID, commitID)
+	return e.Store.Log(ctx, repositoryID, commitID)
 }
 
 func (e *EntryCatalog) ListBranches(ctx context.Context, repositoryID graveler.RepositoryID) (graveler.BranchIterator, error) {
@@ -271,7 +271,7 @@ func (e *EntryCatalog) ListBranches(ctx context.Context, repositoryID graveler.R
 	}); err != nil {
 		return nil, err
 	}
-	return e.store.ListBranches(ctx, repositoryID)
+	return e.Store.ListBranches(ctx, repositoryID)
 }
 
 func (e *EntryCatalog) DeleteBranch(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID) error {
@@ -281,11 +281,11 @@ func (e *EntryCatalog) DeleteBranch(ctx context.Context, repositoryID graveler.R
 	}); err != nil {
 		return err
 	}
-	return e.store.DeleteBranch(ctx, repositoryID, branchID)
+	return e.Store.DeleteBranch(ctx, repositoryID, branchID)
 }
 
 func (e *EntryCatalog) WriteMetaRange(ctx context.Context, repositoryID graveler.RepositoryID, it EntryIterator) (*graveler.MetaRangeID, error) {
-	return e.store.WriteMetaRange(ctx, repositoryID, NewEntryToValueIterator(it))
+	return e.Store.WriteMetaRange(ctx, repositoryID, NewEntryToValueIterator(it))
 }
 
 func (e *EntryCatalog) Commit(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID, committer string, message string, metadata graveler.Metadata) (graveler.CommitID, error) {
@@ -295,7 +295,7 @@ func (e *EntryCatalog) Commit(ctx context.Context, repositoryID graveler.Reposit
 	}); err != nil {
 		return "", err
 	}
-	return e.store.Commit(ctx, repositoryID, branchID, committer, message, metadata)
+	return e.Store.Commit(ctx, repositoryID, branchID, committer, message, metadata)
 }
 
 func (e *EntryCatalog) GetCommit(ctx context.Context, repositoryID graveler.RepositoryID, commitID graveler.CommitID) (*graveler.Commit, error) {
@@ -305,7 +305,7 @@ func (e *EntryCatalog) GetCommit(ctx context.Context, repositoryID graveler.Repo
 	}); err != nil {
 		return nil, err
 	}
-	return e.store.GetCommit(ctx, repositoryID, commitID)
+	return e.Store.GetCommit(ctx, repositoryID, commitID)
 }
 
 func (e *EntryCatalog) Dereference(ctx context.Context, repositoryID graveler.RepositoryID, ref graveler.Ref) (graveler.CommitID, error) {
@@ -315,7 +315,7 @@ func (e *EntryCatalog) Dereference(ctx context.Context, repositoryID graveler.Re
 	}); err != nil {
 		return "", err
 	}
-	return e.store.Dereference(ctx, repositoryID, ref)
+	return e.Store.Dereference(ctx, repositoryID, ref)
 }
 
 func (e *EntryCatalog) Reset(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID) error {
@@ -325,7 +325,7 @@ func (e *EntryCatalog) Reset(ctx context.Context, repositoryID graveler.Reposito
 	}); err != nil {
 		return err
 	}
-	return e.store.Reset(ctx, repositoryID, branchID)
+	return e.Store.Reset(ctx, repositoryID, branchID)
 }
 
 func (e *EntryCatalog) ResetKey(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID, path Path) error {
@@ -337,7 +337,7 @@ func (e *EntryCatalog) ResetKey(ctx context.Context, repositoryID graveler.Repos
 		return err
 	}
 	key := graveler.Key(path)
-	return e.store.ResetKey(ctx, repositoryID, branchID, key)
+	return e.Store.ResetKey(ctx, repositoryID, branchID, key)
 }
 
 func (e *EntryCatalog) ResetPrefix(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID, prefix Path) error {
@@ -348,7 +348,7 @@ func (e *EntryCatalog) ResetPrefix(ctx context.Context, repositoryID graveler.Re
 		return err
 	}
 	keyPrefix := graveler.Key(prefix)
-	return e.store.ResetPrefix(ctx, repositoryID, branchID, keyPrefix)
+	return e.Store.ResetPrefix(ctx, repositoryID, branchID, keyPrefix)
 }
 
 func (e *EntryCatalog) Revert(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID, ref graveler.Ref) (graveler.CommitID, error) {
@@ -358,7 +358,7 @@ func (e *EntryCatalog) Revert(ctx context.Context, repositoryID graveler.Reposit
 	}); err != nil {
 		return "", err
 	}
-	return e.store.Revert(ctx, repositoryID, branchID, ref)
+	return e.Store.Revert(ctx, repositoryID, branchID, ref)
 }
 
 func (e *EntryCatalog) Merge(ctx context.Context, repositoryID graveler.RepositoryID, from graveler.Ref, to graveler.BranchID, committer string, message string, metadata graveler.Metadata) (graveler.CommitID, error) {
@@ -374,7 +374,7 @@ func (e *EntryCatalog) Merge(ctx context.Context, repositoryID graveler.Reposito
 	}); err != nil {
 		return "", err
 	}
-	return e.store.Merge(ctx, repositoryID, from, to, committer, message, metadata)
+	return e.Store.Merge(ctx, repositoryID, from, to, committer, message, metadata)
 }
 
 func (e *EntryCatalog) DiffUncommitted(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID) (EntryDiffIterator, error) {
@@ -384,7 +384,7 @@ func (e *EntryCatalog) DiffUncommitted(ctx context.Context, repositoryID gravele
 	}); err != nil {
 		return nil, err
 	}
-	iter, err := e.store.DiffUncommitted(ctx, repositoryID, branchID)
+	iter, err := e.Store.DiffUncommitted(ctx, repositoryID, branchID)
 	if err != nil {
 		return nil, err
 	}
@@ -399,7 +399,7 @@ func (e *EntryCatalog) Diff(ctx context.Context, repositoryID graveler.Repositor
 	}); err != nil {
 		return nil, err
 	}
-	iter, err := e.store.Diff(ctx, repositoryID, left, right)
+	iter, err := e.Store.Diff(ctx, repositoryID, left, right)
 	if err != nil {
 		return nil, err
 	}
@@ -414,7 +414,7 @@ func (e *EntryCatalog) GetEntry(ctx context.Context, repositoryID graveler.Repos
 	}); err != nil {
 		return nil, err
 	}
-	val, err := e.store.Get(ctx, repositoryID, ref, graveler.Key(path))
+	val, err := e.Store.Get(ctx, repositoryID, ref, graveler.Key(path))
 	if err != nil {
 		return nil, err
 	}
@@ -434,7 +434,7 @@ func (e *EntryCatalog) SetEntry(ctx context.Context, repositoryID graveler.Repos
 	if err != nil {
 		return err
 	}
-	return e.store.Set(ctx, repositoryID, branchID, key, *value)
+	return e.Store.Set(ctx, repositoryID, branchID, key, *value)
 }
 
 func (e *EntryCatalog) DeleteEntry(ctx context.Context, repositoryID graveler.RepositoryID, branchID graveler.BranchID, path Path) error {
@@ -446,7 +446,7 @@ func (e *EntryCatalog) DeleteEntry(ctx context.Context, repositoryID graveler.Re
 		return err
 	}
 	key := graveler.Key(path)
-	return e.store.Delete(ctx, repositoryID, branchID, key)
+	return e.Store.Delete(ctx, repositoryID, branchID, key)
 }
 
 func (e *EntryCatalog) ListEntries(ctx context.Context, repositoryID graveler.RepositoryID, ref graveler.Ref, prefix, delimiter Path) (EntryListingIterator, error) {
@@ -458,7 +458,7 @@ func (e *EntryCatalog) ListEntries(ctx context.Context, repositoryID graveler.Re
 	}); err != nil {
 		return nil, err
 	}
-	iter, err := e.store.List(ctx, repositoryID, ref)
+	iter, err := e.Store.List(ctx, repositoryID, ref)
 	if err != nil {
 		return nil, err
 	}
